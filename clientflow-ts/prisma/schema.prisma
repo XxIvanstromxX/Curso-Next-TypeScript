@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  phone     String? // tipo opcional
+  company   String
+  status    String
+
+  projects   Project[]
+}
+
+model Project {
+  id String @id @default(uuid())
+  name String
+  description String
+  status String
+  clientId String
+
+  client Client @relation(fields: [clientId], references: [id])
+}
+
+
+// Agregar updatedAt y createdAt a ambas tablas
+// Agregar un nuevo modelo de Task
+// valor por defecto para el status y updatedAt/createdAt de Client, Project, Task
