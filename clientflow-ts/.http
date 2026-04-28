@@ -1,0 +1,10 @@
+### POST para crear un nuevo cliente
+POST http://localhost:3000/api/clients
+Content-Type: application/json
+
+{
+    "name": "John Doe",
+    "email": "john23@gmail.com",
+    "phone": "555-1234",
+    "company": "Acme Corp"
+}
