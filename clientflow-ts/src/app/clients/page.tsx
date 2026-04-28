@@ -1,24 +1,16 @@
 'use client';
 
 import { getClients } from '@/server/clients';
-import { formatClientName } from '@/lib/utils';
 import ClientCard from '@/components/ClientCard';
 import { createClient } from '@/server/clients';
 
-// Página que lista todos los clientes del CRM
-// ⚠️ problema intencional: si algún cliente tiene name=null,
-// formatClientName lanzará un TypeError en runtime y la página entera fallará
 export default function ClientsPage() {
   const clients = getClients();
 
   const handlerCreateClient = () => {
-    const newClient = createClient({
-      name: 'Cliente de prueba',
-      email: '',
-      phone: '',
-      company: '',
-      status: 'active',
-    });
+    const input = JSON.parse('{ "name": 123, "email": true}'); // -> {name: 123, email: true}
+
+    const newClient = createClient(input);
 
     console.log('Nuevo cliente creado:', newClient);
   };
