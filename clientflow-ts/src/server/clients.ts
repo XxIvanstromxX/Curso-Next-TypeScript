@@ -1,24 +1,24 @@
-import { clients } from './db';
 import { type Client } from '@/types/client.type';
+import { type CreateClientData, createClientSchema } from './schemas';
 
-// Retorna todos los clientes de la base de datos en memoria
+const clients: Client[] = [];
+
 export function getClients(): Client[] {
   return clients;
 }
 
-// Busca un cliente por id
-// ⚠️ problema intencional: si id no existe retorna undefined sin avisar
-export function getClientById(id: number): Client | undefined {
+export function getClientById(id: string): Client | undefined {
   return clients.find((c) => c.id === id);
 }
 
-// Crea un nuevo cliente y lo agrega al array
-// ⚠️ problema intencional: sin validación de ningún campo
-// ⚠️ problema intencional: Math.random() como id puede colisionar y no es un entero
-export function createClient(client: Client): Client {
+export function createClient(client: CreateClientData): CreateClientData {
+  const data: CreateClientData = createClientSchema.parse(client);
+
   const newClient = {
-    id: Math.random(), // ⚠️ problema intencional: id no determinista y no entero
-    ...client,
+    id: Math.random().toString(36).substring(2, 15), // Genera un ID aleatorio para el cliente
+    status: 'active', // Puedes ajustar esto según tus necesidades
+    phone: data.phone || '', // Asegura que phone tenga un valor, incluso si es opcional
+    ...data,
   };
 
   clients.push(newClient);
