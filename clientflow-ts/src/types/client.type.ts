@@ -8,11 +8,11 @@ export type Client = {
 };
 
 export type Project = {
-  id?: number;
+  id?: string;
   name: string;
   description: string;
   status: string;
-  clientId: number;
+  clientId: string;
 };
 
 // type ClientFormData = {
