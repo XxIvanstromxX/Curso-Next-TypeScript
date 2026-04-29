@@ -1,0 +1,30 @@
+### GET para obtener la lista de clientes
+GET http://localhost:3000/api/clients
+
+### POST para crear un nuevo cliente
+POST http://localhost:3000/api/clients
+Content-Type: application/json
+
+{
+    "name": "John Doe",
+    "email": "john23@gmail.com",
+    "phone": "555-1234",
+    "company": "Acme Corp"
+}
+
+### PUT para actualizar un cliente existente
+PUT http://localhost:3000/api/clients
+Content-Type: application/json
+
+{
+    "id": "6vb1lib7iac",
+    "name": "John Doe Updated"
+}
+
+### DELETE para eliminar un cliente
+DELETE http://localhost:3000/api/clients
+Content-Type: application/json
+
+{
+    "id": "6vb1lib7iac"
+}

@@ -2,10 +2,9 @@ import * as z from 'zod';
 
 // DTO para crear un nuevo cliente, con validación de datos usando Zod
 export const createClientSchema = z.object({
-  id: z.string().optional(),
   name: z.string().min(3, 'Name is required'),
   email: z.email('Invalid email address'),
-  phone: z.string().optional(),
+  phone: z.string().nullable(),
   company: z.string(),
 });
 

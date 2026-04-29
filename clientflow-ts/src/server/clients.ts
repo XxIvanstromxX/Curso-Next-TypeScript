@@ -17,7 +17,6 @@ export function createClient(client: CreateClientData): CreateClientData {
   const newClient = {
     id: Math.random().toString(36).substring(2, 15), // Genera un ID aleatorio para el cliente
     status: 'active', // Puedes ajustar esto según tus necesidades
-    phone: data.phone || '', // Asegura que phone tenga un valor, incluso si es opcional
     ...data,
   };
 
