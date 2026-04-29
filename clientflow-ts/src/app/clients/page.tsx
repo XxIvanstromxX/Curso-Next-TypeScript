@@ -1,62 +1,22 @@
 'use client';
 
 import ClientCard from '@/components/ClientCard';
-import { useState, useEffect } from 'react';
 import { type Client } from '@/types/client.type';
 
 export default function ClientsPage() {
-  const [clients, setClients] = useState<Client[]>([]);
+  const clients: Client[] = [
+    {
+      name: 'Juan Pérez',
+      email: 'juan@gmail.com',
+      phone: '555-1234',
+      company: 'Tech Solutions',
+      status: 'active',
+    },
+  ];
 
-  useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        const response = await fetch('/api/clients');
-        if (!response.ok) {
-          throw new Error('Error al obtener los clientes', {
-            cause: response.statusText,
-          });
-        }
-        const data = await response.json();
-        setClients(data);
-      } catch (error) {
-        console.error('Error al obtener los clientes:', error);
-      }
-    };
-
-    fetchClients();
-  }, []);
-
-  const handlerCreateClient = async () => {
-    const clientePrueba = {
-      name: 'Cliente de prueba',
-      email: 'prueba@gmail.com',
-      phone: null,
-      company: 'Empresa de prueba',
-    };
-
-    try {
-      const response = await fetch('/api/clients', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(clientePrueba),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al crear el cliente', {
-          cause: response.statusText,
-        });
-      }
-
-      const newClient = await response.json();
-      if (newClient) {
-        setClients((prevClients) => [...prevClients, newClient]);
-      }
-      console.log('Cliente creado:', newClient);
-    } catch (error) {
-      console.error('Error al crear el cliente:', error);
-    }
+  const handlerCreateClient = () => {
+    // Aquí puedes implementar la lógica para crear un cliente de prueba
+    console.log('Crear cliente de prueba');
   };
 
   return (
