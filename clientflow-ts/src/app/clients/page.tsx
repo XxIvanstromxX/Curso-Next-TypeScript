@@ -1,18 +1,62 @@
 'use client';
 
-import { getClients } from '@/server/clients';
 import ClientCard from '@/components/ClientCard';
-import { createClient } from '@/server/clients';
+import { useState, useEffect } from 'react';
+import { type Client } from '@/types/client.type';
 
 export default function ClientsPage() {
-  const clients = getClients();
+  const [clients, setClients] = useState([] as Client[]);
 
-  const handlerCreateClient = () => {
-    const input = JSON.parse('{ "name": 123, "email": true}'); // -> {name: 123, email: true}
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await fetch('/api/clients');
+        if (!response.ok) {
+          throw new Error('Error al obtener los clientes', {
+            cause: response.statusText,
+          });
+        }
+        const data = await response.json();
+        setClients(data);
+      } catch (error) {
+        console.error('Error al obtener los clientes:', error);
+      }
+    };
 
-    const newClient = createClient(input);
+    fetchClients();
+  }, []);
 
-    console.log('Nuevo cliente creado:', newClient);
+  const handlerCreateClient = async () => {
+    const clientePrueba = {
+      name: 'Cliente de prueba',
+      email: 'prueba@gmail.com',
+      phone: null,
+      company: 'Empresa de prueba',
+    };
+
+    try {
+      const response = await fetch('/api/clients', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(clientePrueba),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al crear el cliente', {
+          cause: response.statusText,
+        });
+      }
+
+      const newClient = await response.json();
+      if (newClient) {
+        setClients((prevClients) => [...prevClients, newClient]);
+      }
+      console.log('Cliente creado:', newClient);
+    } catch (error) {
+      console.error('Error al crear el cliente:', error);
+    }
   };
 
   return (
@@ -25,12 +69,9 @@ export default function ClientsPage() {
 
         <div className="space-y-4">
           {clients.map((client) => {
-            // ⚠️ problema intencional: formatClientName puede lanzar error aquí
-            // const formattedName = formatClientName(client);
-
             return (
               <ClientCard
-                key={client.id} // ⚠️ problema intencional: id puede ser un float (Math.random)
+                key={client.email}
                 client={client}
                 formattedName={client.name}
               />
@@ -42,7 +83,6 @@ export default function ClientsPage() {
           className="mt-8 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
           onClick={() => handlerCreateClient()}
         >
-          {/* ⚠️ problema intencional: createClient no tiene validación, puede crear clientes con datos inválidos */}
           Crear cliente de prueba
         </button>
       </div>

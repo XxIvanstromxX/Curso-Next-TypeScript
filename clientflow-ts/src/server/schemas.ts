@@ -5,6 +5,7 @@ export const createClientSchema = z.object({
   name: z.string().min(3, 'Name is required'),
   email: z.email('Invalid email address'),
   phone: z.string().nullable(),
+  status: z.enum(['active', 'inactive']).default('active'),
   company: z.string(),
 });
 
@@ -20,6 +21,7 @@ export const idParamSchema = z.object({
 export const showClient = z.object({
   name: z.string(),
   email: z.string(),
+  status: z.enum(['active', 'inactive']),
 });
 
 export type ShowClientData = z.infer<typeof showClient>;

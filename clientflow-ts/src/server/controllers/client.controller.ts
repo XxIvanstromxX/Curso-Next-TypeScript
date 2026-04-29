@@ -34,7 +34,6 @@ export async function createClient(req: Request) {
     await prisma.client.create({
       data: {
         id: Math.random().toString(36).substring(2, 15), // Genera un ID aleatorio para el cliente
-        status: 'active', // Puedes ajustar esto según tus necesidades
         ...parsedData,
       },
     });
