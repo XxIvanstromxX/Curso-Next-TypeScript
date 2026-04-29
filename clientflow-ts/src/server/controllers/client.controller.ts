@@ -4,15 +4,14 @@ import {
   idParamSchema,
   showClient,
   updateClientSchema,
-  type CreateClientData,
 } from '@/server/schemas';
-import * as z from 'zod';
 import { prisma } from '@/lib/prisma';
 
 export async function getClients() {
   try {
     const clients = await prisma.client.findMany();
     const parsedClients = clients.map((client) => showClient.parse(client));
+
     return NextResponse.json(parsedClients, { status: 200 });
   } catch (error) {
     return NextResponse.json(
@@ -28,13 +27,19 @@ export async function getClients() {
 export async function createClient(req: Request) {
   try {
     const body = await req.json();
-    const parsedData: CreateClientData = createClientSchema.parse(body);
-    console.log(parsedData);
+    const parsedData = createClientSchema.safeParse(body);
+
+    if (!parsedData.success) {
+      return NextResponse.json(
+        { message: 'Validation failed', errors: parsedData.error.issues },
+        { status: 400 },
+      );
+    }
 
     await prisma.client.create({
       data: {
         id: Math.random().toString(36).substring(2, 15), // Genera un ID aleatorio para el cliente
-        ...parsedData,
+        ...parsedData.data,
       },
     });
 
@@ -42,15 +47,12 @@ export async function createClient(req: Request) {
       { message: 'Client created successfully', data: parsedData },
       { status: 201 },
     );
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { message: 'Validation failed', errors: error.issues },
-        { status: 400 },
-      );
-    }
+  } catch (e) {
     return NextResponse.json(
-      { message: 'Internal server error' },
+      {
+        message: 'Internal server error',
+        error: e instanceof Error ? e.message : 'Unknown error',
+      },
       { status: 500 },
     );
   }
@@ -59,13 +61,27 @@ export async function createClient(req: Request) {
 export async function updateClient(req: Request) {
   try {
     const body = await req.json();
-    const parsedId = idParamSchema.parse(body);
-    const parsedData = updateClientSchema.parse(body);
+    const parsedId = idParamSchema.safeParse(body);
+    const parsedData = updateClientSchema.safeParse(body);
+
+    if (!parsedId.success) {
+      return NextResponse.json(
+        { message: 'Validation failed', errors: parsedId.error.issues },
+        { status: 400 },
+      );
+    }
+
+    if (!parsedData.success) {
+      return NextResponse.json(
+        { message: 'Validation failed', errors: parsedData.error.issues },
+        { status: 400 },
+      );
+    }
 
     await prisma.client.update({
-      where: { id: parsedId.id },
+      where: { id: parsedId.data.id },
       data: {
-        ...parsedData,
+        ...parsedData.data,
       },
     });
 
@@ -73,17 +89,11 @@ export async function updateClient(req: Request) {
       { message: 'Client updated successfully', data: parsedData },
       { status: 200 },
     );
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { message: 'Validation failed', errors: error.issues },
-        { status: 400 },
-      );
-    }
+  } catch (e) {
     return NextResponse.json(
       {
         message: 'Internal server error',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: e instanceof Error ? e.message : 'Unknown error',
       },
       { status: 500 },
     );
@@ -93,25 +103,28 @@ export async function updateClient(req: Request) {
 export async function deleteClient(req: Request) {
   try {
     const body = await req.json();
-    const parsedId = idParamSchema.parse(body);
+    const parsedId = idParamSchema.safeParse(body);
+    if (!parsedId.success) {
+      return NextResponse.json(
+        { message: 'Validation failed', errors: parsedId.error.issues },
+        { status: 400 },
+      );
+    }
 
     await prisma.client.delete({
-      where: { id: parsedId.id },
+      where: { id: parsedId.data.id },
     });
 
     return NextResponse.json(
       { message: 'Client deleted successfully' },
       { status: 200 },
     );
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { message: 'Validation failed', errors: error.issues },
-        { status: 400 },
-      );
-    }
+  } catch (e) {
     return NextResponse.json(
-      { message: 'Internal server error' },
+      {
+        message: 'Internal server error',
+        error: e instanceof Error ? e.message : 'Unknown error',
+      },
       { status: 500 },
     );
   }
