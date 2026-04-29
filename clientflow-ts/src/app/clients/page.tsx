@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { type Client } from '@/types/client.type';
 
 export default function ClientsPage() {
-  const [clients, setClients] = useState([] as Client[]);
+  const [clients, setClients] = useState<Client[]>([]);
 
   useEffect(() => {
     const fetchClients = async () => {
