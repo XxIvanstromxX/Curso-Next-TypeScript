@@ -5,14 +5,11 @@ type ClientCardProps = {
   formattedName: string;
 };
 
-// Componente que muestra la información básica de un cliente
-// ⚠️ problema intencional: no valida las props, asume que name y email siempre existen
 export default function ClientCard({ client, formattedName }: ClientCardProps) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between">
         <div>
-          {/* ⚠️ problema intencional: formattedName puede fallar antes de llegar aquí */}
           <h2 className="text-lg font-semibold text-gray-900">
             {formattedName}
           </h2>
@@ -25,7 +22,6 @@ export default function ClientCard({ client, formattedName }: ClientCardProps) {
               : 'bg-gray-100 text-gray-500'
           }`}
         >
-          {/* ⚠️ problema intencional: si status no existe, no muestra nada */}
           {client.status}
         </span>
       </div>
@@ -35,9 +31,7 @@ export default function ClientCard({ client, formattedName }: ClientCardProps) {
           <span className="font-medium">Email:</span> {client.email}
         </p>
         <p>
-          <span className="font-medium">Teléfono:</span>{' '}
-          {/* ⚠️ problema intencional: phone puede ser null, se renderiza sin verificar */}
-          {client.phone}
+          <span className="font-medium">Teléfono:</span> {client.phone}
         </p>
         <p>
           <span className="font-medium">ID:</span> {client.id}
