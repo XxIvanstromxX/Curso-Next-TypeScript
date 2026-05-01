@@ -2,21 +2,49 @@
 
 import ClientCard from '@/components/ClientCard';
 import { type Client } from '@/types/client.type';
+import { useState, useEffect } from 'react';
+import ClientForm from '@/components/ClientForm';
+import { type CreateClientData } from '@/server/schemas';
 
 export default function ClientsPage() {
-  const clients: Client[] = [
-    {
-      name: 'Juan Pérez',
-      email: 'juan@gmail.com',
-      phone: '555-1234',
-      company: 'Tech Solutions',
-      status: 'active',
-    },
-  ];
+  const [clients, setClients] = useState<Client[]>([]);
 
-  const handlerCreateClient = () => {
-    // Aquí puedes implementar la lógica para crear un cliente de prueba
-    console.log('Crear cliente de prueba');
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await fetch('/api/clients');
+        const data = await response.json();
+        console.log('Fetched clients:', data);
+        setClients(data);
+      } catch (error) {
+        console.error('Error fetching clients:', error);
+      }
+    };
+
+    fetchClients();
+  }, []);
+
+  const handlerCreateClient = async (data: CreateClientData) => {
+    try {
+      const response = await fetch('/api/clients', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create client');
+      }
+
+      const newClient = await response.json();
+      console.log('Created client:', newClient.data);
+      setClients((prevClients) => [...prevClients, newClient.data]);
+      console.log('Updated clients list:', [...clients, newClient.data]);
+    } catch (error) {
+      console.error('Error creating client:', error);
+    }
   };
 
   return (
@@ -39,12 +67,16 @@ export default function ClientsPage() {
           })}
         </div>
 
-        <button
-          className="mt-8 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-          onClick={() => handlerCreateClient()}
-        >
-          Crear cliente de prueba
-        </button>
+        <div className="mt-8">
+          <h2 className="mb-4 text-2xl font-semibold text-gray-900">
+            Crear nuevo cliente
+          </h2>
+          <ClientForm
+            onSubmit={(data) => {
+              handlerCreateClient(data);
+            }}
+          />
+        </div>
       </div>
     </main>
   );
