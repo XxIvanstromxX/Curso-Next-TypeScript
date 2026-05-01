@@ -44,7 +44,7 @@ export async function createClient(req: Request) {
     });
 
     return NextResponse.json(
-      { message: 'Client created successfully', data: parsedData },
+      { message: 'Client created successfully', data: parsedData.data },
       { status: 201 },
     );
   } catch (e) {
