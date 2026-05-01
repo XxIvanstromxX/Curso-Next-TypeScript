@@ -10,6 +10,7 @@ export const createClientSchema = z.object({
 });
 
 export type CreateClientData = z.infer<typeof createClientSchema>;
+export type CreateClientInput = z.input<typeof createClientSchema>;
 
 export const updateClientSchema = createClientSchema.partial();
 
