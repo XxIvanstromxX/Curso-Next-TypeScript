@@ -4,7 +4,7 @@ export type Client = {
   email: string;
   phone: string | null;
   company: string;
-  status: string;
+  status: 'active' | 'inactive';
 };
 
 export type Project = {
