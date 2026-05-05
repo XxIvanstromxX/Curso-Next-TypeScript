@@ -1,14 +1,15 @@
 import { useForm } from 'react-hook-form';
 import {
-  type CreateClientData,
-  createClientSchema,
-  type CreateClientInput,
+  type ClientCreateOutput,
+  ClientCreateSchema,
+  type ClientCreateInput,
+  type ClientCreateFormData,
 } from '@/server/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 type ClientFormProps = {
-  onSubmit: (data: CreateClientData) => void;
-  initialData?: Partial<CreateClientInput>;
+  onSubmit: (data: ClientCreateInput) => void;
+  initialData?: Partial<ClientCreateOutput>;
 };
 
 export default function ClientForm({ onSubmit, initialData }: ClientFormProps) {
@@ -17,12 +18,12 @@ export default function ClientForm({ onSubmit, initialData }: ClientFormProps) {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<CreateClientInput, unknown, CreateClientData>({
-    resolver: zodResolver(createClientSchema),
+  } = useForm<ClientCreateFormData, unknown, ClientCreateInput>({
+    resolver: zodResolver(ClientCreateSchema),
     defaultValues: initialData,
   });
 
-  const handlerFormSubmit = async (data: CreateClientData) => {
+  const handlerFormSubmit = async (data: ClientCreateInput) => {
     await onSubmit(data);
 
     reset();
@@ -95,6 +96,19 @@ export default function ClientForm({ onSubmit, initialData }: ClientFormProps) {
         </select>
         {errors.status && (
           <p className="mt-1 text-sm text-red-600">{errors.status.message}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Contraseña
+        </label>
+        <input
+          {...register('password')}
+          type="password"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+        />
+        {errors.password && (
+          <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
         )}
       </div>
       <button
