@@ -4,7 +4,7 @@ import ClientCard from '@/components/ClientCard';
 import { type Client } from '@/types/client.type';
 import { useState, useEffect } from 'react';
 import ClientForm from '@/components/ClientForm';
-import { type CreateClientData } from '@/server/schemas';
+import { type ClientCreateInput, ClientResponseSchema } from '@/server/schemas';
 
 export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -15,7 +15,15 @@ export default function ClientsPage() {
         const response = await fetch('/api/clients');
         const data = await response.json();
         console.log('Fetched clients:', data);
-        setClients(data);
+
+        const parsedClients = ClientResponseSchema.array().safeParse(data.data);
+
+        if (!parsedClients.success) {
+          console.error('Error parsing clients:', parsedClients.error);
+          return;
+        }
+
+        setClients(parsedClients.data);
       } catch (error) {
         console.error('Error fetching clients:', error);
       }
@@ -24,7 +32,7 @@ export default function ClientsPage() {
     fetchClients();
   }, []);
 
-  const handlerCreateClient = async (data: CreateClientData) => {
+  const handlerCreateClient = async (data: ClientCreateInput) => {
     try {
       const response = await fetch('/api/clients', {
         method: 'POST',
@@ -40,6 +48,13 @@ export default function ClientsPage() {
 
       const newClient = await response.json();
       console.log('Created client:', newClient.data);
+      const parsedClient = ClientResponseSchema.safeParse(newClient.data);
+
+      if (!parsedClient.success) {
+        console.error('Error parsing new client:', parsedClient.error);
+        return;
+      }
+
       setClients((prevClients) => [...prevClients, newClient.data]);
       console.log('Updated clients list:', [...clients, newClient.data]);
     } catch (error) {
@@ -59,7 +74,7 @@ export default function ClientsPage() {
           {clients.map((client) => {
             return (
               <ClientCard
-                key={client.email}
+                key={client.id}
                 client={client}
                 formattedName={client.name}
               />
