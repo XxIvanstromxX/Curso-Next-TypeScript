@@ -1,16 +1,18 @@
 import { NextResponse } from 'next/server';
 import {
-  createClientSchema,
+  ClientCreateSchema,
+  ClientResponseSchema,
   idParamSchema,
-  showClient,
-  updateClientSchema,
+  ClientUpdateSchema,
 } from '@/server/schemas';
 import { prisma } from '@/lib/prisma';
 
 export async function getClients() {
   try {
     const clients = await prisma.client.findMany();
-    const parsedClients = clients.map((client) => showClient.parse(client));
+    const parsedClients = clients.map((client) =>
+      ClientResponseSchema.parse(client),
+    );
 
     return NextResponse.json(parsedClients, { status: 200 });
   } catch (error) {
@@ -27,7 +29,7 @@ export async function getClients() {
 export async function createClient(req: Request) {
   try {
     const body = await req.json();
-    const parsedData = createClientSchema.safeParse(body);
+    const parsedData = ClientCreateSchema.safeParse(body);
 
     if (!parsedData.success) {
       return NextResponse.json(
@@ -36,15 +38,27 @@ export async function createClient(req: Request) {
       );
     }
 
-    await prisma.client.create({
+    const newClient = await prisma.client.create({
       data: {
         id: Math.random().toString(36).substring(2, 15), // Genera un ID aleatorio para el cliente
         ...parsedData.data,
       },
     });
 
+    const validatedResponse = ClientResponseSchema.safeParse(newClient);
+
+    if (!validatedResponse.success) {
+      return NextResponse.json(
+        {
+          message: 'Response validation failed',
+          errors: validatedResponse.error.issues,
+        },
+        { status: 500 },
+      );
+    }
+
     return NextResponse.json(
-      { message: 'Client created successfully', data: parsedData.data },
+      { message: 'Client created successfully', data: validatedResponse.data },
       { status: 201 },
     );
   } catch (e) {
@@ -62,7 +76,7 @@ export async function updateClient(req: Request) {
   try {
     const body = await req.json();
     const parsedId = idParamSchema.safeParse(body);
-    const parsedData = updateClientSchema.safeParse(body);
+    const parsedData = ClientUpdateSchema.safeParse(body);
 
     if (!parsedId.success) {
       return NextResponse.json(
@@ -78,15 +92,27 @@ export async function updateClient(req: Request) {
       );
     }
 
-    await prisma.client.update({
+    const updatedClient = await prisma.client.update({
       where: { id: parsedId.data.id },
       data: {
         ...parsedData.data,
       },
     });
 
+    const validatedResponse = ClientResponseSchema.safeParse(updatedClient);
+
+    if (!validatedResponse.success) {
+      return NextResponse.json(
+        {
+          message: 'Response validation failed',
+          errors: validatedResponse.error.issues,
+        },
+        { status: 500 },
+      );
+    }
+
     return NextResponse.json(
-      { message: 'Client updated successfully', data: parsedData },
+      { message: 'Client updated successfully', data: validatedResponse.data },
       { status: 200 },
     );
   } catch (e) {
