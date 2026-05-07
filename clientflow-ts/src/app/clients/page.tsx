@@ -16,7 +16,7 @@ export default function ClientsPage() {
         const data = await response.json();
         console.log('Fetched clients:', data);
 
-        const parsedClients = ClientResponseSchema.array().safeParse(data.data);
+        const parsedClients = ClientResponseSchema.array().safeParse(data);
 
         if (!parsedClients.success) {
           console.error('Error parsing clients:', parsedClients.error);
