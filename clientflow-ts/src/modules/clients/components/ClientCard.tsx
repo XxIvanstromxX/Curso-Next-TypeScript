@@ -1,7 +1,8 @@
-import { type Client } from '@/types/client.type';
+'use client';
 
+import { type ClientCreateOutput } from '@/shared/contracts/client.contract';
 type ClientCardProps = {
-  client: Client;
+  client: ClientCreateOutput;
   formattedName: string;
 };
 

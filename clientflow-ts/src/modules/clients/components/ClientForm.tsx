@@ -4,7 +4,7 @@ import {
   ClientCreateSchema,
   type ClientCreateInput,
   type ClientCreateFormData,
-} from '@/server/schemas';
+} from '@/shared/contracts/client.contract';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 type ClientFormProps = {
@@ -98,19 +98,7 @@ export default function ClientForm({ onSubmit, initialData }: ClientFormProps) {
           <p className="mt-1 text-sm text-red-600">{errors.status.message}</p>
         )}
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Contraseña
-        </label>
-        <input
-          {...register('password')}
-          type="password"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-        />
-        {errors.password && (
-          <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-        )}
-      </div>
+
       <button
         type="submit"
         className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
