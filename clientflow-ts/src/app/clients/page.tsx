@@ -1,66 +1,11 @@
 'use client';
 
-import ClientCard from '@/components/ClientCard';
-import { type Client } from '@/types/client.type';
-import { useState, useEffect } from 'react';
-import ClientForm from '@/components/ClientForm';
-import { type ClientCreateInput, ClientResponseSchema } from '@/server/schemas';
+import ClientCard from '@/modules/clients/components/ClientCard';
+import ClientForm from '@/modules/clients/components/ClientForm';
+import { useClients } from '@/modules/clients/hooks/useClients';
 
 export default function ClientsPage() {
-  const [clients, setClients] = useState<Client[]>([]);
-
-  useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        const response = await fetch('/api/clients');
-        const data = await response.json();
-        console.log('Fetched clients:', data);
-
-        const parsedClients = ClientResponseSchema.array().safeParse(data);
-
-        if (!parsedClients.success) {
-          console.error('Error parsing clients:', parsedClients.error);
-          return;
-        }
-
-        setClients(parsedClients.data);
-      } catch (error) {
-        console.error('Error fetching clients:', error);
-      }
-    };
-
-    fetchClients();
-  }, []);
-
-  const handlerCreateClient = async (data: ClientCreateInput) => {
-    try {
-      const response = await fetch('/api/clients', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create client');
-      }
-
-      const newClient = await response.json();
-      console.log('Created client:', newClient.data);
-      const parsedClient = ClientResponseSchema.safeParse(newClient.data);
-
-      if (!parsedClient.success) {
-        console.error('Error parsing new client:', parsedClient.error);
-        return;
-      }
-
-      setClients((prevClients) => [...prevClients, newClient.data]);
-      console.log('Updated clients list:', [...clients, newClient.data]);
-    } catch (error) {
-      console.error('Error creating client:', error);
-    }
-  };
+  const { clients, loading, error, createClient } = useClients();
 
   return (
     <main className="min-h-screen bg-gray-50 px-6 py-10">
@@ -69,6 +14,10 @@ export default function ClientsPage() {
         <p className="mb-8 text-gray-500">
           Lista de todos los clientes registrados en ClientFlow.
         </p>
+
+        {loading && <p className="text-gray-500">Cargando clientes...</p>}
+
+        {error && <p className="text-red-500">Error: {error}</p>}
 
         <div className="space-y-4">
           {clients.map((client) => {
@@ -88,7 +37,7 @@ export default function ClientsPage() {
           </h2>
           <ClientForm
             onSubmit={(data) => {
-              handlerCreateClient(data);
+              void createClient(data);
             }}
           />
         </div>
